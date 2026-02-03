@@ -2,30 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-console.log('SmartSpend: Booting sequence initiated.');
+const rootElement = document.getElementById('root');
 
-// Immediate signal to indicate script execution has reached this file
-if (typeof (window as any).onAppMounted === 'function') {
-  console.log('SmartSpend: Signaling early mount to clear loader.');
-  (window as any).onAppMounted();
-}
-
-const container = document.getElementById('root');
-
-if (container) {
+if (rootElement) {
   try {
-    const root = ReactDOM.createRoot(container);
+    const root = ReactDOM.createRoot(rootElement);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
-    console.log('SmartSpend: React tree rendered successfully.');
-  } catch (err) {
-    console.error("SmartSpend: Bootstrapper Failure:", err);
-    const statusText = document.getElementById('status-text');
-    if (statusText) statusText.innerText = "Runtime Initialization Failed";
+  } catch (error) {
+    console.error("Critical: React mount failed", error);
+    const status = document.getElementById('status-text');
+    if (status) status.innerText = "Runtime Handshake Failed";
   }
 } else {
-  console.error("SmartSpend: Critical - Root mount point missing from DOM.");
+  console.error("Critical: Root element not found in DOM");
 }

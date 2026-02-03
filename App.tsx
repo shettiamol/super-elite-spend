@@ -25,6 +25,13 @@ const AppContent: React.FC = () => {
   const [prefillBill, setPrefillBill] = useState<Partial<BillReminder> | undefined>(undefined);
 
   useEffect(() => {
+    // Clear the global loading screen when the app is ready
+    if (typeof (window as any).onAppMounted === 'function') {
+      (window as any).onAppMounted();
+    }
+  }, []);
+
+  useEffect(() => {
     // Sync theme with document
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
