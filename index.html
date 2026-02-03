@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="manifest" href="./manifest.json?v=4.0.0">
+    <link rel="manifest" href="./manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <title>SmartSpend Elite</title>
     
-    <!-- PWA / APK Native Capability -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SmartSpend">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#0f172a">
     <meta name="format-detection" content="telephone=no">
     
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5511/5511413.png">
@@ -44,26 +41,24 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none !important; }
         html, body {
-            height: 100dvh;
+            height: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
             position: fixed;
-            background: #F8F9FD;
+            background: #0f172a;
         }
-        body.dark { background: #0f172a; }
-        #root { height: 100%; width: 100%; display: flex; flex-direction: column; }
+        #root { height: 100%; width: 100%; }
         .gradient-purple { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* APK Loading State */
-        #splash {
-          position: fixed; inset: 0; z-index: 9999;
-          background: #0f172a; display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          transition: opacity 0.5s ease;
+
+        /* Initial Error Fallback */
+        #loading-fallback {
+            position: fixed; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000;
+            background: #0f172a; color: white; text-align: center; padding: 2rem;
         }
     </style>
     
@@ -80,47 +75,29 @@
     </script>
 </head>
 <body>
-    <!-- APK Initial Booting Screen -->
-    <div id="splash">
-        <div class="w-16 h-16 gradient-purple rounded-[1.5rem] flex items-center justify-center text-white text-2xl mb-6 animate-pulse">
-            <i class="fa-solid fa-bolt-lightning"></i>
-        </div>
-        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Secure Environment Initializing</p>
+    <div id="loading-fallback">
+        <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Initializing Core...</p>
+        <p id="error-hint" class="mt-8 text-[9px] text-slate-600 hidden">Connection check: Ensure internet is active for remote module loading.</p>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // APK Environment Protection
-      window.onload = () => {
-        const splash = document.getElementById('splash');
-        if (splash) {
-          setTimeout(() => {
-            splash.style.opacity = '0';
-            setTimeout(() => splash.remove(), 500);
-          }, 1500);
+      // Show error hint if app doesn't load within 8 seconds
+      setTimeout(() => {
+        const hint = document.getElementById('error-hint');
+        if (hint && document.getElementById('loading-fallback')) {
+          hint.classList.remove('hidden');
         }
-      };
+      }, 8000);
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Unique SW registration per app ID
-          navigator.serviceWorker.register('./sw.js?id=com.smartspend.elite.v3', { scope: './' })
-            .then(reg => {
-              console.log('Elite SW Active');
-              // Request notification permission if not asked
-              if (Notification.permission === 'default' && !window.location.protocol.includes('file')) {
-                Notification.requestPermission();
-              }
-            })
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW Active'))
             .catch(err => console.warn('PWA Layer Restricted', err));
         });
-      }
-
-      // Security Protocol: Detect if running inside a restricted APK WebView
-      const isSecureOrigin = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
-      if (!isSecureOrigin && window.location.protocol !== 'file:') {
-        console.warn("Security: Hardware APIs (Biometrics/GPS) require HTTPS or Localhost.");
       }
     </script>
     <script type="module" src="./index.tsx"></script>

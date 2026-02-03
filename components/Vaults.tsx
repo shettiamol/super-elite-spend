@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppState } from '../store';
 import { Account, SubAccount, BillingCycle } from '../types';
@@ -12,7 +11,7 @@ const ICONS = [
 ];
 
 const Vaults: React.FC = () => {
-  const { accounts, addAccount, updateAccount, deleteAccount, addSubAccount, updateSubAccount, deleteSubAccount, deleteUserAccount, theme, settings } = useAppState();
+  const { accounts, addAccount, updateAccount, deleteAccount, addSubAccount, updateSubAccount, deleteSubAccount, theme, settings, resetAllData } = useAppState();
   
   const [isAccModalOpen, setIsAccModalOpen] = useState(false);
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
@@ -125,22 +124,16 @@ const Vaults: React.FC = () => {
     setIsSubModalOpen(false);
   };
 
-  const handleDeleteMasterAccount = () => {
-    if (window.confirm("WARNING: This will permanently delete your identity profile and ALL local financial records. Continue?")) {
-      deleteUserAccount();
-    }
-  };
-
   return (
     <div className="p-6 pb-32 h-full overflow-y-auto hide-scrollbar">
       <div className="flex justify-between items-center mb-8 px-2">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tight mb-1">Financial Vaults</h1>
+          <h1 className="text-2xl font-black uppercase tracking-tight mb-1">Vaults</h1>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Global Asset Ledger</p>
         </div>
         <button 
           onClick={() => openAccModal()} 
-          className="w-12 h-12 gradient-purple rounded-2xl flex items-center justify-center text-white smooth-deep-shadow transition-transform active:scale-90"
+          className="w-12 h-12 gradient-purple rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform active:scale-90"
         >
           <i className="fa-solid fa-plus"></i>
         </button>
@@ -211,28 +204,6 @@ const Vaults: React.FC = () => {
         })}
       </div>
 
-      <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-        <h2 className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-4 px-2">Danger Zone</h2>
-        <button 
-          onClick={handleDeleteMasterAccount}
-          className="w-full p-6 rounded-[2rem] border border-red-200 bg-red-50 text-red-600 flex items-center justify-between group active:scale-95 transition-all dark:bg-red-500/10 dark:border-red-500/20"
-        >
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-                <i className="fa-solid fa-user-xmark"></i>
-             </div>
-             <div className="text-left">
-                <span className="text-xs font-black uppercase tracking-tight block">Delete Account</span>
-                <span className="text-[8px] font-bold text-red-400 uppercase tracking-widest">Wipe everything and Delete account</span>
-             </div>
-          </div>
-          <i className="fa-solid fa-triangle-exclamation text-red-300"></i>
-        </button>
-        <p className="mt-4 px-6 text-[8px] font-medium text-slate-400 uppercase text-center tracking-widest leading-relaxed">
-          Master deletion tools are also available in <span className="text-indigo-500 font-bold">System Settings</span>.
-        </p>
-      </div>
-
       {isAccModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <form onSubmit={handleSaveAcc} className="bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-sm p-8 shadow-2xl animate-in zoom-in-95">
@@ -283,7 +254,7 @@ const Vaults: React.FC = () => {
                     <i className={`fa-solid ${subForm.icon} text-xl`}></i>
                   </button>
                   {isSubIconDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-[240px] bg-white dark:bg-slate-800 border dark:border-slate-700 p-2 grid grid-cols-5 gap-1 rounded-2xl shadow-2xl z-10 max-h-48 overflow-y-auto">
+                    <div className="absolute top-full left-0 mt-2 w-[240px] bg-white dark:bg-slate-800 border dark:border-slate-700 p-2 grid grid-cols-5 gap-1 rounded-2xl shadow-2xl z-10 max-h-48 overflow-y-auto hide-scrollbar">
                       {ICONS.map(i => (
                         <button key={i} type="button" onClick={() => { setSubForm({...subForm, icon: i}); setIsSubIconDropdownOpen(false); }} className={`w-full aspect-square flex items-center justify-center rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-sm ${subForm.icon === i ? 'bg-indigo-500 text-white' : 'text-slate-400'}`}>
                           <i className={`fa-solid ${i}`}></i>

@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppState, ADMIN_MASTER_CODE } from '../store';
 
 const LockScreen: React.FC = () => {
-  const { theme, settings, unlockApp, user } = useAppState();
+  const { theme, settings, unlockApp } = useAppState();
   const [input, setInput] = useState('');
   const [isError, setIsError] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState<'IDLE' | 'PROCESSING' | 'ERROR'>('IDLE');
@@ -28,15 +27,12 @@ const LockScreen: React.FC = () => {
   const handleBiometrics = async () => {
     setBiometricStatus('PROCESSING');
     
-    // Attempt standard WebAuthn trigger if hardware exists
     if (window.PublicKeyCredential && settings.security.biometricsEnabled) {
        try {
-         // This triggers the native OS biometric prompt (FaceID/Fingerprint)
-         // In a demo/sandbox, we simulate the 'get' credential flow
          const challenge = new Uint8Array(32);
          window.crypto.getRandomValues(challenge);
          
-         // Simulated successful auth
+         // Standard WebAuthn simulation for hybrid environments
          setTimeout(() => {
             unlockApp(settings.security.passcode || '');
             setBiometricStatus('IDLE');
@@ -47,15 +43,13 @@ const LockScreen: React.FC = () => {
          setTimeout(() => setBiometricStatus('IDLE'), 2000);
        }
     } else {
-       // Fallback for demo
-       alert("System: Triggering Simulated Biometrics...");
+       alert("Simulating Biometric Verification...");
        setTimeout(() => unlockApp(settings.security.passcode || ''), 1000);
     }
   };
 
   return (
     <div className="fixed inset-0 z-[500] bg-slate-900 flex flex-col items-center justify-center p-10 select-none">
-       {/* Ambient Glow */}
        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-500/20 blur-[100px] rounded-full"></div>
        
        <div className="text-center mb-16 relative z-10 animate-in fade-in duration-700">
@@ -75,7 +69,7 @@ const LockScreen: React.FC = () => {
           ))}
        </div>
 
-       <div className="grid grid-cols-3 gap-x-8 gap-y-6 w-full max-w-xs relative z-10">
+       <div className="grid grid-cols-3 gap-x-8 gap-y-6 w-full max-xs relative z-10">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'bio', 0, 'del'].map((n, i) => {
             if (n === 'bio') {
               return settings.security.biometricsEnabled ? (

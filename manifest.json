@@ -1,18 +1,14 @@
-
 {
-  "name": "SmartSpend Elite Ledger",
+  "name": "SmartSpend Elite",
   "short_name": "SmartSpend",
-  "id": "com.elite.smartspend.ledger.v3.unique",
-  "description": "Enterprise-grade personal finance protocol with bio-security.",
+  "id": "smartspend.app.elite",
+  "description": "Elite personal finance ledger.",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#6366f1",
-  "dir": "ltr",
-  "lang": "en-US",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/5511/5511413.png",
@@ -26,6 +22,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "prefer_related_applications": false
+  ]
 }
