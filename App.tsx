@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { AppProvider, useAppState } from './store';
 import { AppTab, Transaction, BillReminder } from './types';
@@ -26,7 +27,7 @@ const AppContent: React.FC = () => {
   const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    // Sync theme
+    // Sync theme with body
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark');
@@ -35,17 +36,20 @@ const AppContent: React.FC = () => {
       document.body.classList.remove('dark');
     }
     
-    // Resolve initial load
-    const timer = setTimeout(() => {
+    // Once this effect runs, React has mounted successfully
+    const fallback = document.getElementById('loading-fallback');
+    if (fallback) {
+      fallback.style.opacity = '0';
+      setTimeout(() => {
+        fallback.remove();
+        setIsAppReady(true);
+      }, 500);
+    } else {
       setIsAppReady(true);
-      const fallback = document.getElementById('loading-fallback');
-      if (fallback) fallback.remove();
-    }, 500);
-
-    return () => clearTimeout(timer);
+    }
   }, [theme]);
 
-  // If app is booting, stay on native-ish splash
+  // Prevent UI flashes during handoff
   if (!isAppReady) return null;
 
   // Handle Security Lock

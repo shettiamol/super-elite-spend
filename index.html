@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +19,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+      // Shim process object for browser/APK environment to prevent SDK crashes
+      window.process = window.process || { env: { API_KEY: "" } };
+      
       tailwind.config = {
         darkMode: 'class',
         theme: {
@@ -54,11 +58,12 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Initial Error Fallback */
+        /* Splash Screen */
         #loading-fallback {
             position: fixed; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 1000;
             background: #0f172a; color: white; text-align: center; padding: 2rem;
+            transition: opacity 0.5s ease;
         }
     </style>
     
@@ -78,25 +83,35 @@
     <div id="loading-fallback">
         <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Initializing Core...</p>
-        <p id="error-hint" class="mt-8 text-[9px] text-slate-600 hidden">Connection check: Ensure internet is active for remote module loading.</p>
+        <p id="error-hint" class="mt-8 text-[9px] text-slate-600 hidden">Check connection: Remote modules are loading.</p>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Show error hint if app doesn't load within 8 seconds
+      // Error handling for module loading
+      window.addEventListener('error', function(e) {
+        if (e.target.tagName === 'SCRIPT' || e.message.includes('import')) {
+          const hint = document.getElementById('error-hint');
+          if (hint) {
+            hint.textContent = "Module load error. Ensure internet access is permitted for this APK.";
+            hint.classList.remove('hidden');
+            hint.classList.add('text-rose-500');
+          }
+        }
+      }, true);
+
+      // Auto-hint for slow connections
       setTimeout(() => {
         const hint = document.getElementById('error-hint');
         if (hint && document.getElementById('loading-fallback')) {
           hint.classList.remove('hidden');
         }
-      }, 8000);
+      }, 5000);
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('SW Active'))
-            .catch(err => console.warn('PWA Layer Restricted', err));
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
         });
       }
     </script>

@@ -4,11 +4,10 @@ import { Transaction, Category } from "../types";
 
 /**
  * GEMINI SERVICE
- * This service provides AI-powered financial intelligence using the Google GenAI SDK.
+ * Adheres to standard initialization logic. 
+ * Relies on the window.process shim defined in index.html for APK compatibility.
  */
-
-// Initialize the Google GenAI client with the API key from environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "AI_KEY_NOT_SET" });
 
 export const isAIThrottled = (): boolean => false;
 
@@ -16,6 +15,8 @@ export const isAIThrottled = (): boolean => false;
  * Generates a concise financial insight based on transaction history.
  */
 export const getAIInsight = async (transactions: Transaction[], categories: Category[], _forceRefresh = false): Promise<string> => {
+  if (!process.env.API_KEY) return "AI Insights require a configured API key.";
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -44,6 +45,8 @@ export interface ForecastSuggestion {
  * Provides budget forecasting suggestions using JSON response mode.
  */
 export const getBudgetForecast = async (transactions: Transaction[], categories: Category[]): Promise<ForecastSuggestion[]> => {
+  if (!process.env.API_KEY) return [];
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
@@ -93,8 +96,9 @@ export const generateGoalVisualization = async (
   aspectRatio: "1:1" | "16:9" | "9:16",
   imageSize: "1K" | "2K" | "4K"
 ): Promise<string | null> => {
+  if (!process.env.API_KEY) return null;
+  
   try {
-    // When using pro-image-preview, ensuring we use a new instance to respect potential API key updates.
     const imageAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await imageAi.models.generateContent({
       model: 'gemini-3-pro-image-preview',
