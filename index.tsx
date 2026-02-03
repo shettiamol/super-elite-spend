@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -14,3 +13,8 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Signal to index.html that the app has successfully mounted
+if ((window as any).onAppMounted) {
+  (window as any).onAppMounted();
+}

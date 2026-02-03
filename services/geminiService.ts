@@ -1,23 +1,30 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Transaction, Category } from "../types";
 
 /**
  * GEMINI SERVICE
- * Adheres to standard initialization logic. 
- * Relies on the window.process shim defined in index.html for APK compatibility.
+ * We lazy-initialize the AI client to prevent top-level ReferenceErrors 
+ * during the critical APK boot sequence.
  */
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "AI_KEY_NOT_SET" });
+let aiInstance: any = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    // Falls back to the shim defined in index.html if process is missing
+    const apiKey = (window as any).process?.env?.API_KEY || "AI_KEY_NOT_SET";
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 export const isAIThrottled = (): boolean => false;
 
-/**
- * Generates a concise financial insight based on transaction history.
- */
 export const getAIInsight = async (transactions: Transaction[], categories: Category[], _forceRefresh = false): Promise<string> => {
-  if (!process.env.API_KEY) return "AI Insights require a configured API key.";
+  const apiKey = (window as any).process?.env?.API_KEY;
+  if (!apiKey) return "AI Insights require a configured API key.";
   
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Analyze these recent transactions and provide a short, actionable financial insight (max 50 words). 
@@ -41,13 +48,12 @@ export interface ForecastSuggestion {
   subCategorySuggestions: { subCategoryId: string; suggestedBudget: number; reason: string }[];
 }
 
-/**
- * Provides budget forecasting suggestions using JSON response mode.
- */
 export const getBudgetForecast = async (transactions: Transaction[], categories: Category[]): Promise<ForecastSuggestion[]> => {
-  if (!process.env.API_KEY) return [];
+  const apiKey = (window as any).process?.env?.API_KEY;
+  if (!apiKey) return [];
   
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: `Suggest budget adjustments based on this data:
@@ -88,19 +94,17 @@ export const getBudgetForecast = async (transactions: Transaction[], categories:
   }
 };
 
-/**
- * Generates an AI-powered image visualization for financial goals.
- */
 export const generateGoalVisualization = async (
   prompt: string, 
   aspectRatio: "1:1" | "16:9" | "9:16",
   imageSize: "1K" | "2K" | "4K"
 ): Promise<string | null> => {
-  if (!process.env.API_KEY) return null;
+  const apiKey = (window as any).process?.env?.API_KEY;
+  if (!apiKey) return null;
   
   try {
-    const imageAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const response = await imageAi.models.generateContent({
+    const ai = getAI();
+    const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
       contents: {
         parts: [{ text: `A high-quality, inspiring 3D render or photograph representing the following financial goal: ${prompt}. Cinematic lighting, optimistic mood.` }]
