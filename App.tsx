@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { AppProvider, useAppState } from './store';
 import { AppTab, Transaction, BillReminder } from './types';
@@ -24,33 +23,15 @@ const AppContent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [prefillBill, setPrefillBill] = useState<Partial<BillReminder> | undefined>(undefined);
-  const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    // Sync theme with body
+    // Sync theme with document
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-    }
-    
-    // Once this effect runs, React has mounted successfully
-    const fallback = document.getElementById('loading-fallback');
-    if (fallback) {
-      fallback.style.opacity = '0';
-      setTimeout(() => {
-        fallback.remove();
-        setIsAppReady(true);
-      }, 500);
-    } else {
-      setIsAppReady(true);
     }
   }, [theme]);
-
-  // Prevent UI flashes during handoff
-  if (!isAppReady) return null;
 
   // Handle Security Lock
   if (isLocked && settings.security.passcode) return <LockScreen />;
@@ -87,7 +68,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div 
-      className={`flex flex-col h-full w-full max-w-md mx-auto relative overflow-hidden transition-colors duration-500 animate-in fade-in ${theme === 'dark' ? 'bg-slate-900 text-slate-100' : 'bg-[#F8F9FD] text-slate-800'}`}
+      className={`flex flex-col h-full w-full max-w-md mx-auto relative overflow-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-slate-900 text-slate-100' : 'bg-[#F8F9FD] text-slate-800'}`}
       style={{ fontFamily: settings.fontFamily }}
     >
       <Header onSettingsClick={() => setActiveTab('SETTINGS')} />

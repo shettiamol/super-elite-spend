@@ -2,33 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-const mountApp = () => {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) {
-    console.error("Critical Failure: Root element not found");
-    return;
-  }
+const container = document.getElementById('root');
 
+if (container) {
   try {
-    const root = ReactDOM.createRoot(rootElement);
+    const root = ReactDOM.createRoot(container);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
-
-    // Signal success immediately after render call
-    if ((window as any).onAppMounted) {
+    
+    // Signal readiness to the loading screen in index.html
+    if (typeof (window as any).onAppMounted === 'function') {
       (window as any).onAppMounted();
     }
   } catch (err) {
-    console.error("Mounting Error:", err);
+    console.error("Bootstrapper Failure:", err);
+    const statusText = document.getElementById('status-text');
+    if (statusText) statusText.innerText = "Runtime Initialization Failed";
   }
-};
-
-// Handle both direct execution and late DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mountApp);
 } else {
-  mountApp();
+  console.error("Critical: Root mount point missing from DOM.");
 }
