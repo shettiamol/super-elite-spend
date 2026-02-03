@@ -25,14 +25,15 @@ const AppContent: React.FC = () => {
   const [prefillBill, setPrefillBill] = useState<Partial<BillReminder> | undefined>(undefined);
 
   useEffect(() => {
-    // Clear the global loading screen when the app is ready
+    // Notify the window that the application has mounted and is visible.
+    // This removes the loading screen from index.html
     if (typeof (window as any).onAppMounted === 'function') {
       (window as any).onAppMounted();
     }
   }, []);
 
   useEffect(() => {
-    // Sync theme with document
+    // Sync theme with document class list
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -40,7 +41,7 @@ const AppContent: React.FC = () => {
     }
   }, [theme]);
 
-  // Handle Security Lock
+  // Handle Security Lock Screen
   if (isLocked && settings.security.passcode) return <LockScreen />;
 
   const openNewTransaction = () => {

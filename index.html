@@ -71,13 +71,13 @@
 <body>
     <div id="loading-fallback">
         <div class="spinner mb-6"></div>
-        <p id="status-text" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Initializing Core Protocol...</p>
+        <p id="status-text" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Initializing SmartSpend Core...</p>
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Signal for the app to clear the loader
+      // The app calls this once the root component is fully mounted.
       window.onAppMounted = () => {
         const fb = document.getElementById('loading-fallback');
         if (fb) {
@@ -86,14 +86,14 @@
         }
       };
 
-      // Watchdog timer
+      // Watchdog timer to prevent indefinite loading screens
       setTimeout(() => {
         const fb = document.getElementById('loading-fallback');
         if (fb && fb.style.opacity !== '0') {
            const st = document.getElementById('status-text');
-           if (st) st.innerHTML = 'Module synchronization slow... <br/><button onclick="window.onAppMounted()" style="margin-top:20px; color:#6366f1; font-size:10px; font-weight:900; border:1px solid #6366f1; padding:8px 16px; border-radius:12px; cursor:pointer;">FORCE START</button>';
+           if (st) st.innerHTML = 'Synchronization slow... <br/><button onclick="window.onAppMounted()" style="margin-top:20px; color:#6366f1; font-size:10px; font-weight:900; border:1px solid #6366f1; padding:8px 16px; border-radius:12px; cursor:pointer;">FORCE START</button>';
         }
-      }, 8000);
+      }, 10000);
     </script>
 </body>
 </html>

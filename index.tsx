@@ -2,21 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-const rootElement = document.getElementById('root');
+const container = document.getElementById('root');
 
-if (rootElement) {
+if (container) {
   try {
-    const root = ReactDOM.createRoot(rootElement);
+    const root = ReactDOM.createRoot(container);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
   } catch (error) {
-    console.error("Critical: React mount failed", error);
+    console.error("SmartSpend Boot Error:", error);
     const status = document.getElementById('status-text');
-    if (status) status.innerText = "Runtime Handshake Failed";
+    if (status) status.innerText = "System Failure: Handshake Aborted";
   }
 } else {
-  console.error("Critical: Root element not found in DOM");
+  console.error("SmartSpend Critical: Root element not found.");
 }
